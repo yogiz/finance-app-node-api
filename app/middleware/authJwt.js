@@ -1,10 +1,11 @@
 const jwt = require("jsonwebtoken");
-const config = require("../config/auth.config.js");
+const { JWT_SECRET } = require("../../config.js");
 const db = require("../models");
 const User = db.user;
 
 verifyToken = (req, res, next) => {
-  let token = req.headers["x-access-token"];
+  let authHeader = req.headers["Authorization"] || req.headers["authorization"];
+  let token = authHeader ? authHeader.split(" ")[1] : null;
 
   if (!token) {
     return res.status(403).send({
@@ -12,14 +13,33 @@ verifyToken = (req, res, next) => {
     });
   }
 
-  jwt.verify(token, config.secret, (err, decoded) => {
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
     if (err) {
       return res.status(401).send({
         message: "Unauthorized!"
       });
     }
     req.userId = decoded.id;
+    req.email = decoded.email;
     next();
+  });
+};
+
+isSuperAdmin = (req, res, next) => {
+  User.findByPk(req.userId).then(user => {
+    user.getRoles().then(roles => {
+      for (let i = 0; i < roles.length; i++) {
+        if (roles[i].name === "superadmin") {
+          next();
+          return;
+        }
+      }
+
+      res.status(403).send({
+        message: "Require Super Admin Role!"
+      });
+      return;
+    });
   });
 };
 
@@ -41,28 +61,11 @@ isAdmin = (req, res, next) => {
   });
 };
 
-isModerator = (req, res, next) => {
+isSuperAdminOrAdmin = (req, res, next) => {
   User.findByPk(req.userId).then(user => {
     user.getRoles().then(roles => {
       for (let i = 0; i < roles.length; i++) {
-        if (roles[i].name === "staff") {
-          next();
-          return;
-        }
-      }
-
-      res.status(403).send({
-        message: "Require Moderator Role!"
-      });
-    });
-  });
-};
-
-isModeratorOrAdmin = (req, res, next) => {
-  User.findByPk(req.userId).then(user => {
-    user.getRoles().then(roles => {
-      for (let i = 0; i < roles.length; i++) {
-        if (roles[i].name === "moderator") {
+        if (roles[i].name === "superadmin") {
           next();
           return;
         }
@@ -74,7 +77,46 @@ isModeratorOrAdmin = (req, res, next) => {
       }
 
       res.status(403).send({
-        message: "Require Moderator or Admin Role!"
+        message: "Require superadmin or Admin Role!"
+      });
+    });
+  });
+};
+
+isStaff = (req, res, next) => {
+  User.findByPk(req.userId).then(user => {
+    user.getRoles().then(roles => {
+      for (let i = 0; i < roles.length; i++) {
+        if (roles[i].name === "staff") {
+          next();
+          return;
+        }
+      }
+
+      res.status(403).send({
+        message: "Require staff Role!"
+      });
+    });
+  });
+};
+
+isStaffOrAdmin = (req, res, next) => {
+  User.findByPk(req.userId).then(user => {
+    user.getRoles().then(roles => {
+      for (let i = 0; i < roles.length; i++) {
+        if (roles[i].name === "staff") {
+          next();
+          return;
+        }
+
+        if (roles[i].name === "admin") {
+          next();
+          return;
+        }
+      }
+
+      res.status(403).send({
+        message: "Require Staff or Admin Role!"
       });
     });
   });
@@ -83,7 +125,9 @@ isModeratorOrAdmin = (req, res, next) => {
 const authJwt = {
   verifyToken: verifyToken,
   isAdmin: isAdmin,
-  isModerator: isModerator,
-  isModeratorOrAdmin: isModeratorOrAdmin
+  isStaff: isStaff,
+  isStaffOrAdmin: isStaffOrAdmin,
+  isSuperAdmin: isSuperAdmin,
+  isSuperAdminOrAdmin: isSuperAdminOrAdmin
 };
 module.exports = authJwt;

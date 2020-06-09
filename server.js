@@ -1,11 +1,17 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-
+const {
+  SERVER_PORT, 
+  ROLES, 
+  CORS_ORIGIN, 
+  SUPERADMIN_USER,
+  SUPERADMIN_EMAIL,
+  SUPERADMIN_PASSWORD } = require('./config.js')
 const app = express();
 
 var corsOptions = {
-  origin: ["http://localhost:8080","http://localhost:8081","http://testing.test","https://testing.test"]
+  origin: CORS_ORIGIN
 };
 
 app.use(cors(corsOptions));
@@ -20,12 +26,18 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const db = require("./app/models");
 const Role = db.role;
 
-db.sequelize.sync();
+// db.sequelize.sync();
 // force: true will drop the table if it already exists
-// db.sequelize.sync({force: true}).then(() => {
-//   console.log('Drop and Resync Database with { force: true }');
-//   initial();
-// });
+db.sequelize.sync({force: true}).then(() => {
+  console.log('Drop and Resync Database with { force: true }');
+  initial_role();
+
+  const { initSuperAdmin } = require("./app/controllers/auth.controller");
+  initSuperAdmin(SUPERADMIN_USER,
+    SUPERADMIN_EMAIL,
+    SUPERADMIN_PASSWORD);
+
+});
 
 // simple route
 app.get("/", (req, res) => {
@@ -35,34 +47,20 @@ app.get("/", (req, res) => {
 // routes
 require('./app/routes/auth.routes')(app);
 require('./app/routes/user.routes')(app);
+require('./app/routes/token.routes')(app);
 
 // set port, listen for requests
-const PORT = process.env.PORT || 8001;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}.`);
+app.listen(SERVER_PORT, () => {
+  console.log(`Server is running on port ${SERVER_PORT}.`);
 });
 
 
-function initial() {
+function initial_role() {
   // initialize type of role user (Role in website world, not in company each user world)
-  Role.create({
-    id: 1,
-    name: "superadmin"
-  });
- 
-  Role.create({
-    id: 2,
-    name: "admin"
-  });
- 
-  Role.create({
-    id: 3,
-    name: "staff"
-  });
-
-  Role.create({
-    id: 4,
-    name: "user"
-  });
-
+  for(let i = 0; i < ROLES.length; i++){
+    Role.create({
+      id: i + 1,
+      name: ROLES[i]
+    });
+  }
 }

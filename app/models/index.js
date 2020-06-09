@@ -1,20 +1,20 @@
-const config = require("../config/db.config.js");
+const { DB_CONF, ROLES } = require("../../config.js");
 
 const Sequelize = require("sequelize");
 const sequelize = new Sequelize(
-  config.DB,
-  config.USER,
-  config.PASSWORD,
+  DB_CONF.DB,
+  DB_CONF.USER,
+  DB_CONF.PASSWORD,
   {
-    host: config.HOST,
-    dialect: config.dialect,
-    operatorsAliases: false,
+    host: DB_CONF.HOST,
+    dialect: DB_CONF.dialect,
+    // operatorsAliases: false,
 
     pool: {
-      max: config.pool.max,
-      min: config.pool.min,
-      acquire: config.pool.acquire,
-      idle: config.pool.idle
+      max: DB_CONF.pool.max,
+      min: DB_CONF.pool.min,
+      acquire: DB_CONF.pool.acquire,
+      idle: DB_CONF.pool.idle
     }
   }
 );
@@ -26,6 +26,7 @@ db.sequelize = sequelize;
 
 db.user = require("../models/user.model.js")(sequelize, Sequelize);
 db.role = require("../models/role.model.js")(sequelize, Sequelize);
+db.token = require("../models/token.model.js")(sequelize, Sequelize);
 
 
 db.role.belongsToMany(db.user, {
@@ -39,6 +40,12 @@ db.user.belongsToMany(db.role, {
   otherKey: "roleId"
 });
 
-db.ROLES = ["superadmin", "admin", "staff", "user"];
+db.user.hasMany(db.token, { as: "tokens" })
+db.token.belongsTo(db.user, {
+  foreignKey: "userId",
+  as:"user"
+});
+
+db.ROLES = ROLES;
 
 module.exports = db;
