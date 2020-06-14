@@ -1,4 +1,5 @@
-const { authJwt } = require("../middleware");
+const { verifyToken, isStaff, isAdmin } = require("../middleware/authJwt.js");
+const { uploadingProfile } = require("../middleware/profile.js");
 const controller = require("../controllers/user.controller");
 
 module.exports = function(app) {
@@ -15,19 +16,23 @@ module.exports = function(app) {
 
   app.get(
     "/api/test/user",
-    [authJwt.verifyToken],
+    [verifyToken],
     controller.userBoard
   );
 
   app.get(
     "/api/test/mod",
-    [authJwt.verifyToken, authJwt.isStaff],
+    [verifyToken, isStaff],
     controller.moderatorBoard
   );
 
   app.get(
     "/api/test/admin",
-    [authJwt.verifyToken, authJwt.isAdmin],
+    [verifyToken, isAdmin],
     controller.adminBoard
   );
+
+  app.post("/api/profile/image",[verifyToken, uploadingProfile], controller.uploadProfileImage);
+  app.post("/api/profile/update",verifyToken, controller.updateProfile);
+
 };

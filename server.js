@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+var path = require('path');
 const cors = require("cors");
 const {
   SERVER_PORT, 
@@ -22,32 +23,35 @@ app.use(bodyParser.json());
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// set static folder
+app.use(express.static(path.join(__dirname, 'public')));
+
 // database
 const db = require("./app/models");
 const Role = db.role;
 
-// db.sequelize.sync();
+db.sequelize.sync();
 // force: true will drop the table if it already exists
-db.sequelize.sync({force: true}).then(() => {
-  console.log('Drop and Resync Database with { force: true }');
-  initial_role();
+// db.sequelize.sync({force: true}).then(() => {
+//   console.log('Drop and Resync Database with { force: true }');
+//   initial_role();
+//   const { initSuperAdmin } = require("./app/controllers/auth.controller");
+//   initSuperAdmin(SUPERADMIN_USER,
+//     SUPERADMIN_EMAIL,
+//     SUPERADMIN_PASSWORD);
 
-  const { initSuperAdmin } = require("./app/controllers/auth.controller");
-  initSuperAdmin(SUPERADMIN_USER,
-    SUPERADMIN_EMAIL,
-    SUPERADMIN_PASSWORD);
-
-});
+// });
 
 // simple route
-app.get("/", (req, res) => {
-  res.json({ message: "Welcome to bezkoder application." });
-});
+// app.get("/", (req, res) => {
+//   res.json({ message: "Welcome." });
+// });
 
 // routes
 require('./app/routes/auth.routes')(app);
 require('./app/routes/user.routes')(app);
 require('./app/routes/token.routes')(app);
+require('./app/routes/company.routes')(app);
 
 // set port, listen for requests
 app.listen(SERVER_PORT, () => {

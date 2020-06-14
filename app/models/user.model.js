@@ -23,6 +23,12 @@ module.exports = (sequelize, Sequelize) => {
     bio: {
       type: Sequelize.STRING
     },
+    phoneNumber: {
+      type: Sequelize.STRING
+    },
+    address: {
+      type: Sequelize.STRING
+    },
     profileImage: {
       type: Sequelize.STRING
     },
@@ -30,6 +36,12 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.BOOLEAN, 
       defaultValue: false
     },
+    ownCompanies:{
+      type: Sequelize.STRING
+    },
+    companies: {
+      type: Sequelize.STRING
+    }
   });
 
   return User;

@@ -20,6 +20,7 @@ module.exports = {
     },
 
     ROLES : ["superadmin", "admin", "staff", "user"],
+    COMPANY_ROLES : ["owner", "admin", "accountant", "inspector", "cashier","employee"],
 
     CORS_ORIGIN : [
         "http://localhost:8080",
