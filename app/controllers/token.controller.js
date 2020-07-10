@@ -38,11 +38,14 @@ exports.getResetToken = (req, res) => {
                 receiver: user.email,
                 sender: SENDGRID_EMAIL_FROM,
                 templateName: 'password_reset',
-                name: user.username,
-                confirm_account__url: "http://"+req.headers.host+"/api/runTokenAction/?token="+ resetToken,
             }
-            sendEmailTemplate(emailData).then((result)=>{
-                res.send({message: "Token Created, check your email."});
+            let dynamic_data = {
+                name: user.username,
+                confirm_account_url:  "http://"+req.headers.host+"/api/runTokenAction/?token="+ resetToken,
+              }
+
+            sendEmailTemplate(emailData,dynamic_data).then((result)=>{
+                res.send({message: "Token Created, check your email.", email_not_activated : result.email_not_activated});
             });
         })
     }).catch(err=>{

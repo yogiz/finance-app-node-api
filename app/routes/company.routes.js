@@ -13,6 +13,23 @@ module.exports = function(app) {
     });
     app.post(
         "/api/company/create",
+        verifyToken,
         controller.createCompany
+    );
+    
+    // Invite an user to be employee in a company
+    // companyId, email (who want to be invited), role (what role you want that user be)
+    app.post(               
+        "/api/company/invite",
+        verifyToken,
+        controller.inviteEmployee
+    );
+
+    // Accept Invitation 
+    // companyId
+    app.post(               
+      "/api/company/acceptInvitation",
+      verifyToken,
+      controller.acceptInvitation
     );
 };

@@ -23,11 +23,14 @@ module.exports = (sequelize, Sequelize) => {
       phoneNumber: {
         type: Sequelize.STRING
       },
+      website: {
+        type: Sequelize.STRING
+      },
       owner: {
         type: Sequelize.STRING
       },
       users: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING  // {userId : config.COMPANY_ROLES, userId : config.COMPANY_ROLES}
       }
     });
   

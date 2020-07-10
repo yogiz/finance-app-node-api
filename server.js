@@ -30,16 +30,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 const db = require("./app/models");
 const Role = db.role;
 
-db.sequelize.sync();
-// force: true will drop the table if it already exists
-// db.sequelize.sync({force: true}).then(() => {
+db.sequelize.sync({alter: true});
+
+// db.sequelize.sync({force: true}).then(() => { // force: true will drop the table if it already exists
 //   console.log('Drop and Resync Database with { force: true }');
 //   initial_role();
 //   const { initSuperAdmin } = require("./app/controllers/auth.controller");
 //   initSuperAdmin(SUPERADMIN_USER,
 //     SUPERADMIN_EMAIL,
 //     SUPERADMIN_PASSWORD);
-
 // });
 
 // simple route

@@ -29,14 +29,19 @@ module.exports = {
         "https://testing.test"
     ],
 
+    SIGNUP_URL : "https://bacapikiran.com",
+
     SUPERADMIN_USER     : process.env.SUPERADMIN_USER,
     SUPERADMIN_EMAIL    : process.env.SUPERADMIN_EMAIL,
     SUPERADMIN_PASSWORD : process.env.SUPERADMIN_PASSWORD,
 
+    //  EMAIL CONFIGURATION
+    ACTIVATE_EMAIL      : false,
     SENDGRID_API_KEY    : process.env.SENDGRID_API_KEY,
     SENDGRID_EMAIL_FROM : process.env.SENDGRID_EMAIL_FROM,
     SENDGRID_TEMPLATE : {
         password_reset        : process.env.SENDGRID_TEMPLATE_PASSWORD_RESET,
         confirm_account       : process.env.SENDGRID_TEMPLATE_CONFIRM_ACCOUNT,
+        employee_invitation       : process.env.SENDGRID_TEMPLATE_EMPLOYEE_INVITATION,
     }
 };

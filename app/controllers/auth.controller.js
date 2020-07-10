@@ -46,11 +46,14 @@ exports.signup = (req, res) => {
               receiver: user.email,
               sender: SENDGRID_EMAIL_FROM,
               templateName: 'confirm_account',
-              name: user.username,
-              confirm_account__url: "http://"+req.headers.host+"/api/runTokenAction/?token="+ verifyToken,
             }
-            sendEmailTemplate(emailData).then((result)=>{
-              res.send({ message: "User registered successfully!", needVerify : true});
+            let dynamic_data = {
+              name: user.username,
+              confirm_account_url:  "http://"+req.headers.host+"/api/runTokenAction/?token="+ verifyToken,
+            }
+            
+            sendEmailTemplate(emailData, dynamic_data).then((result)=>{
+              res.send({ message: "User registered successfully!", needVerify : true, email_not_activated : result.email_not_activated});
             });
 
           });
